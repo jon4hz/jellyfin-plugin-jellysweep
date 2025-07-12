@@ -1,0 +1,21 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.ci for more information
+# Note: Using pre-commit.ci lite with GitHub Actions for custom tooling support
+repos:
+  # Built-in hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: '(static/static/dist/style\.css|\.json)$'
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  # Gitleaks - Secret detection
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.27.2
+    hooks:
+      - id: gitleaks
