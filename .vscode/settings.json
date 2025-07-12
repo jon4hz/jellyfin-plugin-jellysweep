@@ -11,5 +11,24 @@
   // ~/.local/share/jellyfin
   "jellyfinDataDir": "${env:HOME}/.local/share/jellyfin",
   // The name of the plugin
-  "pluginName": "Jellyfin.Plugin.Jellysweep"
+  "pluginName": "Jellyfin.Plugin.Jellysweep",
+
+  // Prettier configuration
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
