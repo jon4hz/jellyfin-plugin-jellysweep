@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jellysweep Configuration</title>
+  </head>
+
+  <body>
+    <div
+      id="JellysweepConfigPage"
+      data-role="page"
+      class="page type-interior pluginConfigurationPage"
+      data-require="emby-input,emby-button,emby-select,emby-checkbox"
+    >
+      <div data-role="content">
+        <div class="content-primary">
+          <form id="JellysweepConfigForm">
+            <div class="sectionTitleContainer flex align-items-center">
+              <h2 class="sectionTitle">Jellysweep Configuration</h2>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="chkEnabled" type="checkbox" is="emby-checkbox" />
+                <span>Enable Jellysweep Integration</span>
+              </label>
+              <div class="fieldDescription checkboxFieldDescription">
+                Enable or disable the Jellysweep plugin functionality.
+              </div>
+            </div>
+
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="txtJellysweepApiUrl">Jellysweep API URL:</label>
+              <input id="txtJellysweepApiUrl" type="text" is="emby-input" class="emby-input" />
+              <div class="fieldDescription">
+                The base URL of your Jellysweep API endpoint (e.g., https://jellysweep.example.com/api)
+              </div>
+            </div>
+
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="txtJellysweepApiKey">Jellysweep API Key:</label>
+              <input id="txtJellysweepApiKey" type="password" is="emby-input" class="emby-input" />
+              <div class="fieldDescription">Your Jellysweep API key for authentication</div>
+            </div>
+
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="txtCacheDuration">Cache Duration (minutes):</label>
+              <input id="txtCacheDuration" type="number" is="emby-input" class="emby-input" min="1" max="1200" />
+              <div class="fieldDescription">How long to cache API responses to reduce server load (1-1200 minutes)</div>
+            </div>
+
+            <div>
+              <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                <span>Save</span>
+              </button>
+            </div>
+
+            <div style="margin-top: 20px">
+              <button
+                id="btnTestConnection"
+                is="emby-button"
+                type="button"
+                class="raised emby-button"
+                style="min-height: 44px; padding: 0 20px"
+              >
+                <span>Test Connection</span>
+              </button>
+              <div id="connectionTestResult" style="margin-top: 10px; display: none">
+                <div id="connectionTestMessage" class="fieldDescription"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        var JellysweepConfig = {
+          pluginUniqueId: 'bfd3327c-74c8-4664-8473-4fd2a4258be4',
+        };
+
+        document.querySelector('#JellysweepConfigPage').addEventListener('pageshow', function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(JellysweepConfig.pluginUniqueId).then(function (config) {
+            $('#chkEnabled').prop('checked', config.IsEnabled || false);
+            $('#txtJellysweepApiUrl').val(config.JellysweepApiUrl || '');
+            $('#txtJellysweepApiKey').val(config.JellysweepApiKey || '');
+            $('#txtCacheDuration').val(config.CacheDurationMinutes || 60);
+            Dashboard.hideLoadingMsg();
+          });
+        });
+
+        document.querySelector('#JellysweepConfigPage').addEventListener('submit', function (e) {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(JellysweepConfig.pluginUniqueId).then(function (config) {
+            var isEnabled = $('#chkEnabled').prop('checked');
+            config.IsEnabled = isEnabled;
+            config.JellysweepApiUrl = $('#txtJellysweepApiUrl').val();
+            config.JellysweepApiKey = $('#txtJellysweepApiKey').val();
+            config.CacheDurationMinutes = parseInt($('#txtCacheDuration').val()) || 60;
+            ApiClient.updatePluginConfiguration(JellysweepConfig.pluginUniqueId, config).then(function (result) {
+              Dashboard.processPluginConfigurationUpdateResult(result);
+            });
+          });
+
+          e.preventDefault();
+          return false;
+        });
+
+        $('#btnTestConnection').on('click', function () {
+          var button = $(this);
+          var originalText = button.find('span').text();
+          var resultDiv = $('#connectionTestResult');
+          var messageDiv = $('#connectionTestMessage');
+
+          button.find('span').text('Testing...');
+          button.prop('disabled', true);
+          resultDiv.hide();
+
+          // Use the exposed function from jellysweep.js if available
+          var testPromise = ApiClient.getJSON(ApiClient.serverAddress() + '/Plugins/Jellysweep/TestConnection');
+          testPromise
+            .then(function (response) {
+              button.find('span').text(originalText);
+              button.prop('disabled', false);
+
+              if (response.IsConnected) {
+                messageDiv.html('<span style="color: #00d4aa;">✓ ' + response.Message + '</span>');
+              } else {
+                messageDiv.html('<span style="color: #ff6b6b;">✗ ' + response.Message + '</span>');
+              }
+
+              resultDiv.show();
+            })
+            .catch(function (error) {
+              button.find('span').text(originalText);
+              button.prop('disabled', false);
+
+              messageDiv.html(
+                '<span style="color: #ff6b6b;">✗ Connection test failed: ' +
+                  (error.message || 'Unknown error') +
+                  '</span>'
+              );
+              resultDiv.show();
+            });
+        });
+      </script>
+    </div>
+  </body>
+</html>
