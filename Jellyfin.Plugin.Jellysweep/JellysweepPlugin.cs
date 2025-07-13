@@ -60,7 +60,7 @@ public class JellysweepPlugin : BasePlugin<PluginConfiguration>, IHasWebPages
                     }
 
                     string scriptReplace = "<script plugin=\"Jellysweep\".*?></script>";
-                    string scriptElement = string.Format(CultureInfo.InvariantCulture, "<script plugin=\"Jellysweep\" version=\"1.0.0.0\" src=\"{0}/Plugins/Jellysweep/ClientScript\" defer></script>", basePath);
+                    string scriptElement = string.Format(CultureInfo.InvariantCulture, "<script plugin=\"Jellysweep\" version=\"1.0.0.0\" src=\"{0}/Plugins/Jellysweep/Static/ClientScript\" defer></script>", basePath);
 
                     if (!indexContents.Contains(scriptElement, StringComparison.Ordinal))
                     {

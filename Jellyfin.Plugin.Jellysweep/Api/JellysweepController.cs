@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using System.Reflection;
 using Jellyfin.Plugin.Jellysweep.Api.Responses;
 using Jellyfin.Plugin.Jellysweep.Services;
 using MediaBrowser.Controller.Library;
@@ -34,8 +33,6 @@ public class JellysweepController(
     private readonly ILoggerFactory _loggerFactory = loggerFactory;
     private static readonly HttpClient _httpClient = new();
     private static readonly MemoryCache _cache = new(new MemoryCacheOptions());
-    private readonly Assembly _assembly = Assembly.GetExecutingAssembly();
-    private readonly string _jellysweepScriptPath = $"{Assembly.GetExecutingAssembly().GetName().Name}.Web.jellysweep.js";
 
     /// <summary>
     /// Check if a media item is marked for deletion by Jellysweep.
@@ -106,24 +103,5 @@ public class JellysweepController(
                 Message = $"Connection test failed: {ex.Message}"
             });
         }
-    }
-
-    /// <summary>
-    /// Get the javascript file for the Jellysweep plugin.
-    /// </summary>
-    /// <response code="200">Javascript file successfully returned.</response>
-    /// <response code="404">File not found.</response>
-    /// <returns>The "jellysweep.js" embedded file.</returns>
-    [HttpGet("ClientScript")]
-    public ActionResult GetClientScript()
-    {
-        var scriptStream = _assembly.GetManifestResourceStream(_jellysweepScriptPath);
-
-        if (scriptStream != null)
-        {
-            return File(scriptStream, "application/javascript");
-        }
-
-        return NotFound();
     }
 }
