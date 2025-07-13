@@ -1,0 +1,7 @@
+{
+    "lsp": {
+        "csharp": {
+            "command": "csharp-ls"
+        }
+    }
+}

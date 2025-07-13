@@ -27,4 +27,14 @@
     <EmbeddedResource Include="Configuration\configPage.html" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Web\jellysweep.js" />
+    <EmbeddedResource Include="Web\jellysweep.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Web\jellysweep.png" />
+    <EmbeddedResource Include="Web\jellysweep.png" />
+  </ItemGroup>
+
 </Project>

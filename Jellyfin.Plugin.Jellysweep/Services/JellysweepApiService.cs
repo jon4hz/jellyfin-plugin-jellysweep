@@ -1,9 +1,3 @@
-using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellysweep.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -38,7 +32,7 @@ public class JellysweepApiService
     /// <returns>A task representing the asynchronous operation with a boolean result indicating if the connection is successful.</returns>
     public async Task<bool> TestConnectionAsync(CancellationToken cancellationToken = default)
     {
-        var config = Plugin.Instance?.Configuration;
+        var config = JellysweepPlugin.Instance?.Configuration;
         if (config == null || string.IsNullOrEmpty(config.JellysweepApiUrl) || string.IsNullOrEmpty(config.JellysweepApiKey))
         {
             return false;

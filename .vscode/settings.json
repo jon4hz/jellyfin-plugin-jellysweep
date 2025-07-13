@@ -13,6 +13,13 @@
   // The name of the plugin
   "pluginName": "Jellyfin.Plugin.Jellysweep",
 
+  // Python configuration
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.env.linux": {
+    "VIRTUAL_ENV": "${workspaceFolder}/.venv"
+  },
+
   // Prettier configuration
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
@@ -30,5 +37,8 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+},
+"[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+}
 }

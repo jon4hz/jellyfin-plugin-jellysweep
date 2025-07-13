@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.Jellysweep.Api;
+namespace Jellyfin.Plugin.Jellysweep.Api.Responses;
 
 /// <summary>
 /// Response model for connection test.

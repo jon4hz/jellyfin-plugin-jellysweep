@@ -116,7 +116,7 @@
           resultDiv.hide();
 
           // Use the exposed function from jellysweep.js if available
-          var testPromise = ApiClient.getJSON(ApiClient.serverAddress() + '/Plugins/Jellysweep/testconnection');
+          var testPromise = ApiClient.getJSON(ApiClient.serverAddress() + '/Plugins/Jellysweep/TestConnection');
           testPromise
             .then(function (response) {
               button.find('span').text(originalText);
