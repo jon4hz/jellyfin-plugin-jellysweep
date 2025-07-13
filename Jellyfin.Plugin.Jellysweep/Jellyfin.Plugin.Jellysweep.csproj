@@ -11,6 +11,20 @@
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PublishDeps>true</PublishDeps>
+
+    <!-- Version Information -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PluginVersion>1.0.0.0</PluginVersion>
+
+    <!-- Package Information -->
+    <PackageId>Jellyfin.Plugin.Jellysweep</PackageId>
+    <Title>Jellysweep</Title>
+    <Authors>jon4hz</Authors>
+    <Description>A Jellyfin plugin for Jellysweep</Description>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/jon4hz/jellyfin-plugin-jellysweep</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,12 +54,36 @@
     <EmbeddedResource Include="Web\jellysweep.png" />
   </ItemGroup>
 
-  <!-- Ensure dependencies are copied to output -->
-  <Target Name="CopyDependencies" AfterTargets="Publish">
+  <!-- Create plugin package -->
+  <Target Name="CreatePluginPackage" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <PluginDir>$(MSBuildProjectDirectory)/../bin/plugin</PluginDir>
+      <PluginArchive>$(MSBuildProjectDirectory)/../bin/jellyfin-plugin-jellysweep-$(PluginVersion).zip</PluginArchive>
+    </PropertyGroup>
+
+    <!-- Include only specific DLLs we want in the plugin package -->
     <ItemGroup>
-      <DependencyFiles Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(AssemblyName).dll" />
+      <!-- Always include the main plugin DLL -->
+      <PluginFiles Include="$(PublishDir)$(AssemblyName).dll" />
+      <!-- Include specific third-party dependencies -->
+      <PluginFiles Include="$(PublishDir)Humanizer.dll" />
     </ItemGroup>
-    <Copy SourceFiles="@(DependencyFiles)" DestinationFolder="$(PublishDir)" />
+
+    <RemoveDir Directories="$(PluginDir)" />
+    <MakeDir Directories="$(PluginDir)" />
+
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(PluginDir)" />
+
+    <!-- Log what files are being included -->
+    <Message Text="Plugin package contents:" Importance="high" />
+    <Message Text="  - %(PluginFiles.Filename)%(PluginFiles.Extension)" Importance="high" />
+
+    <!-- Use cross-platform zip command or fallback -->
+    <Exec Command="which zip > /dev/null 2>&amp;1 &amp;&amp; cd &quot;$(PluginDir)&quot; &amp;&amp; zip -r &quot;$(PluginArchive)&quot; . || echo 'zip command not available, package created in $(PluginDir)'"
+          ContinueOnError="true" />
+
+    <Message Text="Plugin files prepared in: $(PluginDir)" Importance="high" />
+    <Message Text="Plugin package: $(PluginArchive)" Importance="high" Condition="Exists('$(PluginArchive)')" />
   </Target>
 
 </Project>
