@@ -171,8 +171,8 @@
     icon.src = LOGO_URL;
     icon.alt = 'Jellysweep';
     icon.style.cssText = `
-            width: 20px;
-            height: 20px;
+            width: 64px;
+            height: 64px;
             opacity: 0.8;
             flex-shrink: 0;
         `;

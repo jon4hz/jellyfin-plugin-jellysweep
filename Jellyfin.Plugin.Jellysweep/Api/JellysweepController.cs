@@ -1,6 +1,5 @@
 using System.Net.Mime;
-using Humanizer;
-using Humanizer.Localisation;
+using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.Jellysweep.Api.Responses;
 using Jellyfin.Plugin.Jellysweep.Services;
 using MediaBrowser.Controller.Library;
@@ -33,7 +32,6 @@ public class JellysweepController(
     private readonly ILibraryManager _libraryManager = libraryManager;
     private readonly ILogger<JellysweepController> _logger = logger;
     private readonly ILoggerFactory _loggerFactory = loggerFactory;
-    private static readonly HttpClient _httpClient = new();
     private static readonly MemoryCache _cache = new(new MemoryCacheOptions());
 
     /// <summary>
@@ -42,13 +40,14 @@ public class JellysweepController(
     /// <param name="itemId">The ID of the media item.</param>
     /// <returns>The deletion status information including human-readable time format.</returns>
     /// <response code="200">Returns the deletion status information.</response>
+    /// <response code="400">If the item is not a movie or TV show.</response>
     /// <response code="404">If the item is not found.</response>
     /// <response code="500">If an error occurs while checking the item.</response>
     [HttpGet("IsItemMarkedForDeletion/{itemId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public ActionResult<DeletionStatusResponse> IsItemMarkedForDeletion(string itemId)
+    public async Task<ActionResult<DeletionStatusResponse>> IsItemMarkedForDeletion(string itemId)
     {
         try
         {
@@ -58,7 +57,27 @@ public class JellysweepController(
                 return NotFound();
             }
 
-            // Dummy data: return in 30 days for now
+            // check if item is a tvshow or movie
+            if (item.GetBaseItemKind() != BaseItemKind.Movie && item.GetBaseItemKind() != BaseItemKind.Series)
+            {
+                return BadRequest("Item is not a movie or TV show.");
+            }
+
+            // caching is something for later
+            _ = _cache;
+
+            var serviceLogger = _loggerFactory.CreateLogger<JellysweepApiService>();
+            var jellysweepService = new JellysweepApiService(_libraryManager, serviceLogger);
+
+            var deletionDate = await jellysweepService.IsItemMarkedForDeletionAsync(itemId).ConfigureAwait(false);
+
+            return Ok(new DeletionStatusResponse
+            {
+                IsMarkedForDeletion = deletionDate != null,
+                HumanizedTimeUntilDeletion = deletionDate
+            });
+
+            /* // Dummy data: return in 30 days for now
             var deletionDate = DateTimeOffset.UtcNow.AddDays(30);
             var timeUntilDeletion = deletionDate - DateTimeOffset.UtcNow;
 
@@ -67,7 +86,7 @@ public class JellysweepController(
                 IsMarkedForDeletion = true,
                 DeletionDate = deletionDate,
                 HumanizedTimeUntilDeletion = timeUntilDeletion.Humanize(precision: 1, minUnit: TimeUnit.Day) // Show up to 2 time units
-            });
+            }); */
 
             // Check if the item is marked for deletion by Jellysweep
             /* var isMarkedForDeletion = item.GetUserData()?.GetValue("JellysweepMarkedForDeletion") as bool? ?? false;
@@ -89,11 +108,10 @@ public class JellysweepController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ConnectionTestResponse>> TestConnection(CancellationToken cancellationToken)
     {
-        _ = _libraryManager; // to avoid unused variable warning for now
         try
         {
             var serviceLogger = _loggerFactory.CreateLogger<JellysweepApiService>();
-            var jellysweepService = new JellysweepApiService(_httpClient, serviceLogger, _cache);
+            var jellysweepService = new JellysweepApiService(_libraryManager, serviceLogger);
             var isConnected = await jellysweepService.TestConnectionAsync(cancellationToken).ConfigureAwait(false);
 
             return Ok(new ConnectionTestResponse
