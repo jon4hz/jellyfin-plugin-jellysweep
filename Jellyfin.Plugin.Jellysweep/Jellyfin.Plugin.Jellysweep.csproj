@@ -9,11 +9,14 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PublishDeps>true</PublishDeps>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Jellyfin.Controller" Version="10.10.7" />
     <PackageReference Include="Jellyfin.Model" Version="10.10.7" />
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,5 +39,13 @@
     <None Remove="Web\jellysweep.png" />
     <EmbeddedResource Include="Web\jellysweep.png" />
   </ItemGroup>
+
+  <!-- Ensure dependencies are copied to output -->
+  <Target Name="CopyDependencies" AfterTargets="Publish">
+    <ItemGroup>
+      <DependencyFiles Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(AssemblyName).dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DependencyFiles)" DestinationFolder="$(PublishDir)" />
+  </Target>
 
 </Project>

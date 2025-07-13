@@ -1,4 +1,6 @@
 using System.Net.Mime;
+using Humanizer;
+using Humanizer.Localisation;
 using Jellyfin.Plugin.Jellysweep.Api.Responses;
 using Jellyfin.Plugin.Jellysweep.Services;
 using MediaBrowser.Controller.Library;
@@ -38,15 +40,15 @@ public class JellysweepController(
     /// Check if a media item is marked for deletion by Jellysweep.
     /// </summary>
     /// <param name="itemId">The ID of the media item.</param>
-    /// <returns>The deletion date if the item is marked for deletion, otherwise null.</returns>
-    /// <response code="200">Returns the deletion date if the item is marked for deletion, otherwise null.</response>
+    /// <returns>The deletion status information including human-readable time format.</returns>
+    /// <response code="200">Returns the deletion status information.</response>
     /// <response code="404">If the item is not found.</response>
     /// <response code="500">If an error occurs while checking the item.</response>
     [HttpGet("IsItemMarkedForDeletion/{itemId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public ActionResult<DateTimeOffset?> IsItemMarkedForDeletion(string itemId)
+    public ActionResult<DeletionStatusResponse> IsItemMarkedForDeletion(string itemId)
     {
         try
         {
@@ -56,8 +58,16 @@ public class JellysweepController(
                 return NotFound();
             }
 
-            // dummy date, return in 30 days for now
-            return Ok(DateTimeOffset.UtcNow.AddDays(30));
+            // Dummy data: return in 30 days for now
+            var deletionDate = DateTimeOffset.UtcNow.AddDays(30);
+            var timeUntilDeletion = deletionDate - DateTimeOffset.UtcNow;
+
+            return Ok(new DeletionStatusResponse
+            {
+                IsMarkedForDeletion = true,
+                DeletionDate = deletionDate,
+                HumanizedTimeUntilDeletion = timeUntilDeletion.Humanize(precision: 1, minUnit: TimeUnit.Day) // Show up to 2 time units
+            });
 
             // Check if the item is marked for deletion by Jellysweep
             /* var isMarkedForDeletion = item.GetUserData()?.GetValue("JellysweepMarkedForDeletion") as bool? ?? false;

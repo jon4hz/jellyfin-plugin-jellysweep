@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jellyfin.Plugin.Jellysweep.Api;
@@ -26,6 +27,9 @@ public class StaticController : ControllerBase
     /// <response code="404">File not found.</response>
     /// <returns>The "jellysweep.js" embedded file.</returns>
     [HttpGet("ClientScript")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Produces("application/javascript")]
     public ActionResult GetClientScript()
     {
         var scriptStream = _assembly.GetManifestResourceStream(_jellysweepScriptPath);
@@ -45,6 +49,9 @@ public class StaticController : ControllerBase
     /// <response code="404">File not found.</response>
     /// <returns>The "jellysweep.png" embedded file.</returns>
     [HttpGet("Logo")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Produces("image/png")]
     public ActionResult GetLogo()
     {
         var logoStream = _assembly.GetManifestResourceStream(_jellysweepLogoPath);
