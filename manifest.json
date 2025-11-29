@@ -7,6 +7,15 @@
     "owner": "jon4hz",
     "category": "General",
     "imageUrl": "https://media.githubusercontent.com/media/jon4hz/jellyfin-plugin-jellysweep/main/Web/jellysweep.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "0.2.0.0",
+        "changelog": "- See the full changelog at [GitHub](https://github.com/jon4hz/jellyfin-plugin-jellysweep/releases/tag/v0.2.0)\n",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/jon4hz/jellyfin-plugin-jellysweep/releases/download/v0.2.0/jellyfin-plugin-jellysweep-0.2.0.zip",
+        "checksum": "fdbe55c3da4ad0bf3a7014bd24fab06d",
+        "timestamp": "2025-11-29T18:40:56Z"
+      }
+    ]
   }
 ]
