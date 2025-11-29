@@ -1,1 +1,12 @@
-{}
+[
+  {
+    "guid": "bfd3327c-74c8-4664-8473-4fd2a4258be4",
+    "name": "Jellysweep",
+    "overview": "Companion plugin for Jellysweep",
+    "description": "Companion plugin for Jellysweep",
+    "owner": "jon4hz",
+    "category": "General",
+    "imageUrl": "https://media.githubusercontent.com/media/jon4hz/jellyfin-plugin-jellysweep/main/Web/jellysweep.png",
+    "versions": []
+  }
+]
