@@ -17,30 +17,7 @@ namespace Jellyfin.Plugin.Jellysweep.Api;
 public class StaticController : ControllerBase
 {
     private readonly Assembly _assembly = Assembly.GetExecutingAssembly();
-    private readonly string _jellysweepScriptPath = $"{Assembly.GetExecutingAssembly().GetName().Name}.Web.jellysweep.js";
     private readonly string _jellysweepLogoPath = $"{Assembly.GetExecutingAssembly().GetName().Name}.Web.jellysweep.png";
-
-    /// <summary>
-    /// Get the javascript file for the Jellysweep plugin.
-    /// </summary>
-    /// <response code="200">Javascript file successfully returned.</response>
-    /// <response code="404">File not found.</response>
-    /// <returns>The "jellysweep.js" embedded file.</returns>
-    [HttpGet("ClientScript")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Produces("application/javascript")]
-    public ActionResult GetClientScript()
-    {
-        var scriptStream = _assembly.GetManifestResourceStream(_jellysweepScriptPath);
-
-        if (scriptStream != null)
-        {
-            return File(scriptStream, "application/javascript");
-        }
-
-        return NotFound();
-    }
 
     /// <summary>
     /// Get the logo image for the Jellysweep plugin.

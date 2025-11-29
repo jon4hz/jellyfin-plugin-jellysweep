@@ -19,12 +19,13 @@ public class JellysweepApiService(
     ILibraryManager libraryManager,
     ILogger<JellysweepApiService> logger)
 {
-    private const string UserAgent = "Jellyfin-Plugin-Jellysweep/1.0.0";
     private const string ApiKeyHeader = "X-API-Key";
     private readonly ILibraryManager _libraryManager = libraryManager;
     private readonly ILogger<JellysweepApiService> _logger = logger;
 
     private static readonly HttpClient _httpClient = new();
+
+    private static string UserAgent => $"Jellyfin-Plugin-Jellysweep/{JellysweepPlugin.Instance?.Version?.ToString() ?? "devel"}";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JellysweepApiService"/> class.
