@@ -6,7 +6,7 @@
     "description": "Companion plugin for Jellysweep",
     "owner": "jon4hz",
     "category": "General",
-    "imageUrl": "https://media.githubusercontent.com/media/jon4hz/jellyfin-plugin-jellysweep/main/Web/jellysweep.png",
+    "imageUrl": "https://media.githubusercontent.com/media/jon4hz/jellyfin-plugin-jellysweep/main/logo.png",
     "versions": [
       {
         "version": "0.2.0.0",
