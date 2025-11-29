@@ -5,7 +5,7 @@
 
   const PLUGIN_NAME = 'Jellysweep';
   const API_BASE = '/Plugins/Jellysweep';
-  const LOGO_URL = '/Plugins/Jellysweep/Static/Logo';
+  const LOGO_URL = API_BASE + '/Static/Logo';
 
   let lastProcessedItemId = null;
   let isProcessing = false;
@@ -111,7 +111,6 @@
 
     const text = document.createElement('span');
     text.textContent = textData.shortText;
-    text.style.cssText = 'font-weight:500;white-space:nowrap;';
 
     badge.appendChild(icon);
     badge.appendChild(text);
@@ -129,12 +128,6 @@
       target.appendChild(badge);
       return;
     }
-    const nameContainer = document.querySelector('.nameContainer');
-    if (nameContainer && nameContainer.parentNode) {
-      nameContainer.parentNode.insertBefore(badge, nameContainer.nextSibling);
-      return;
-    }
-    badge.style.cssText += ';position:fixed;top:20px;right:20px;z-index:10000;';
     document.body.appendChild(badge);
   }
 
