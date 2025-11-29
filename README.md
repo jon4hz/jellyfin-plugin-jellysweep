@@ -41,7 +41,6 @@ This plugin requires the following plugins to be installed as well:
 
 - [Jellyfin-JavaScript-Injector](https://github.com/n00bcodr/Jellyfin-JavaScript-Injector)
 - [jellyfin-plugin-file-transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) (optional, but recommended)
--
 
 ### Install Plugin
 
