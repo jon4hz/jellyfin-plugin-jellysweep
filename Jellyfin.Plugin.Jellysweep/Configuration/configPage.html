@@ -19,16 +19,6 @@
               <h2 class="sectionTitle">Jellysweep Configuration</h2>
             </div>
 
-            <div class="checkboxContainer checkboxContainer-withDescription">
-              <label class="emby-checkbox-label">
-                <input id="chkEnabled" type="checkbox" is="emby-checkbox" />
-                <span>Enable Jellysweep Integration</span>
-              </label>
-              <div class="fieldDescription checkboxFieldDescription">
-                Enable or disable the Jellysweep plugin functionality.
-              </div>
-            </div>
-
             <div class="inputContainer">
               <label class="inputLabel inputLabelUnfocused" for="txtJellysweepApiUrl">Jellysweep API URL:</label>
               <input id="txtJellysweepApiUrl" type="text" is="emby-input" class="emby-input" />
@@ -41,12 +31,6 @@
               <label class="inputLabel inputLabelUnfocused" for="txtJellysweepApiKey">Jellysweep API Key:</label>
               <input id="txtJellysweepApiKey" type="password" is="emby-input" class="emby-input" />
               <div class="fieldDescription">Your Jellysweep API key for authentication</div>
-            </div>
-
-            <div class="inputContainer">
-              <label class="inputLabel inputLabelUnfocused" for="txtCacheDuration">Cache Duration (minutes):</label>
-              <input id="txtCacheDuration" type="number" is="emby-input" class="emby-input" min="1" max="1200" />
-              <div class="fieldDescription">How long to cache API responses to reduce server load (1-1200 minutes)</div>
             </div>
 
             <div>
@@ -80,10 +64,8 @@
         document.querySelector('#JellysweepConfigPage').addEventListener('pageshow', function () {
           Dashboard.showLoadingMsg();
           ApiClient.getPluginConfiguration(JellysweepConfig.pluginUniqueId).then(function (config) {
-            $('#chkEnabled').prop('checked', config.IsEnabled || false);
             $('#txtJellysweepApiUrl').val(config.JellysweepApiUrl || '');
             $('#txtJellysweepApiKey').val(config.JellysweepApiKey || '');
-            $('#txtCacheDuration').val(config.CacheDurationMinutes || 60);
             Dashboard.hideLoadingMsg();
           });
         });
@@ -92,10 +74,8 @@
           Dashboard.showLoadingMsg();
           ApiClient.getPluginConfiguration(JellysweepConfig.pluginUniqueId).then(function (config) {
             var isEnabled = $('#chkEnabled').prop('checked');
-            config.IsEnabled = isEnabled;
             config.JellysweepApiUrl = $('#txtJellysweepApiUrl').val();
             config.JellysweepApiKey = $('#txtJellysweepApiKey').val();
-            config.CacheDurationMinutes = parseInt($('#txtCacheDuration').val()) || 60;
             ApiClient.updatePluginConfiguration(JellysweepConfig.pluginUniqueId, config).then(function (result) {
               Dashboard.processPluginConfigurationUpdateResult(result);
             });

@@ -1,14 +1,11 @@
-using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using Humanizer;
 using Humanizer.Localisation;
 using Jellyfin.Data.Enums;
-using Jellyfin.Plugin.Jellysweep.Configuration;
 using Jellyfin.Plugin.Jellysweep.Services.Requests;
 using Jellyfin.Plugin.Jellysweep.Services.Responses;
 using MediaBrowser.Controller.Library;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.Jellysweep.Services;

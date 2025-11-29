@@ -40,7 +40,7 @@ restore:
 
 test: build
 	@echo "Testing build output..."
-	@if [ ! -f "Jellyfin.Plugin.Jellysweep/bin/Release/net8.0/Jellyfin.Plugin.Jellysweep.dll" ]; then \
+	@if [ ! -f "Jellyfin.Plugin.Jellysweep/bin/Release/net9.0/Jellyfin.Plugin.Jellysweep.dll" ]; then \
 		echo "Build test failed - DLL not found"; \
 		exit 1; \
 	fi
@@ -73,10 +73,10 @@ install: package
 dev-install: debug
 	@echo "Installing debug build to local Jellyfin..."
 	sudo mkdir -p /var/lib/jellyfin/plugins/Jellysweep
-	sudo cp Jellyfin.Plugin.Jellysweep/bin/Debug/net8.0/Jellyfin.Plugin.Jellysweep.dll /var/lib/jellyfin/plugins/Jellysweep/
+	sudo cp Jellyfin.Plugin.Jellysweep/bin/Debug/net9.0/Jellyfin.Plugin.Jellysweep.dll /var/lib/jellyfin/plugins/Jellysweep/
 	# Copy Humanizer dependency for debug builds
-	@if [ -f "Jellyfin.Plugin.Jellysweep/bin/Debug/net8.0/Humanizer.dll" ]; then \
-		sudo cp Jellyfin.Plugin.Jellysweep/bin/Debug/net8.0/Humanizer.dll /var/lib/jellyfin/plugins/Jellysweep/; \
+	@if [ -f "Jellyfin.Plugin.Jellysweep/bin/Debug/net9.0/Humanizer.dll" ]; then \
+		sudo cp Jellyfin.Plugin.Jellysweep/bin/Debug/net9.0/Humanizer.dll /var/lib/jellyfin/plugins/Jellysweep/; \
 	fi
 	@echo "Debug plugin installed. Restart Jellyfin to load the updated plugin."
 

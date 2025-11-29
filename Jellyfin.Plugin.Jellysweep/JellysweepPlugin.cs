@@ -31,69 +31,66 @@ public class JellysweepPlugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
         Instance = this;
 
-        if (Configuration.IsEnabled)
+        if (!string.IsNullOrWhiteSpace(applicationPaths.WebPath))
         {
-            if (!string.IsNullOrWhiteSpace(applicationPaths.WebPath))
+            var indexFile = Path.Combine(applicationPaths.WebPath, "index.html");
+            if (File.Exists(indexFile))
             {
-                var indexFile = Path.Combine(applicationPaths.WebPath, "index.html");
-                if (File.Exists(indexFile))
+                string indexContents = File.ReadAllText(indexFile);
+                string basePath = string.Empty;
+
+                // Get base path from network config
+                try
                 {
-                    string indexContents = File.ReadAllText(indexFile);
-                    string basePath = string.Empty;
+                    var networkConfig = configurationManager.GetConfiguration("network");
+                    var configType = networkConfig.GetType();
+                    var basePathField = configType.GetProperty("BaseUrl");
+                    var confBasePath = basePathField?.GetValue(networkConfig)?.ToString()?.Trim('/');
 
-                    // Get base path from network config
-                    try
+                    if (!string.IsNullOrEmpty(confBasePath))
                     {
-                        var networkConfig = configurationManager.GetConfiguration("network");
-                        var configType = networkConfig.GetType();
-                        var basePathField = configType.GetProperty("BaseUrl");
-                        var confBasePath = basePathField?.GetValue(networkConfig)?.ToString()?.Trim('/');
-
-                        if (!string.IsNullOrEmpty(confBasePath))
-                        {
-                            basePath = "/" + confBasePath.ToString();
-                        }
+                        basePath = "/" + confBasePath.ToString();
                     }
-                    catch (Exception e)
+                }
+                catch (Exception e)
+                {
+                    logger.LogError("Unable to get base path from config, using '/': {0}", e);
+                }
+
+                string scriptReplace = "<script plugin=\"Jellysweep\".*?></script>";
+                string scriptElement = string.Format(CultureInfo.InvariantCulture, "<script plugin=\"Jellysweep\" version=\"1.0.0.0\" src=\"{0}/Plugins/Jellysweep/Static/ClientScript\" defer></script>", basePath);
+
+                if (!indexContents.Contains(scriptElement, StringComparison.Ordinal))
+                {
+                    logger.LogInformation("Attempting to inject jellysweep script code in {0}", indexFile);
+
+                    // Replace old Jellysweep scripts
+                    indexContents = Regex.Replace(indexContents, scriptReplace, string.Empty);
+
+                    // Insert script last in body
+                    int bodyClosing = indexContents.LastIndexOf("</body>", StringComparison.Ordinal);
+                    if (bodyClosing != -1)
                     {
-                        logger.LogError("Unable to get base path from config, using '/': {0}", e);
-                    }
+                        indexContents = indexContents.Insert(bodyClosing, scriptElement);
 
-                    string scriptReplace = "<script plugin=\"Jellysweep\".*?></script>";
-                    string scriptElement = string.Format(CultureInfo.InvariantCulture, "<script plugin=\"Jellysweep\" version=\"1.0.0.0\" src=\"{0}/Plugins/Jellysweep/Static/ClientScript\" defer></script>", basePath);
-
-                    if (!indexContents.Contains(scriptElement, StringComparison.Ordinal))
-                    {
-                        logger.LogInformation("Attempting to inject jellysweep script code in {0}", indexFile);
-
-                        // Replace old Jellysweep scripts
-                        indexContents = Regex.Replace(indexContents, scriptReplace, string.Empty);
-
-                        // Insert script last in body
-                        int bodyClosing = indexContents.LastIndexOf("</body>", StringComparison.Ordinal);
-                        if (bodyClosing != -1)
+                        try
                         {
-                            indexContents = indexContents.Insert(bodyClosing, scriptElement);
-
-                            try
-                            {
-                                File.WriteAllText(indexFile, indexContents);
-                                logger.LogInformation("Finished injecting jellysweep script code in {0}", indexFile);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.LogError("Encountered exception while writing to {0}: {1}", indexFile, e);
-                            }
+                            File.WriteAllText(indexFile, indexContents);
+                            logger.LogInformation("Finished injecting jellysweep script code in {0}", indexFile);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            logger.LogInformation("Could not find closing body tag in {0}", indexFile);
+                            logger.LogError("Encountered exception while writing to {0}: {1}", indexFile, e);
                         }
                     }
                     else
                     {
-                        logger.LogInformation("Found client script injected in {0}", indexFile);
+                        logger.LogInformation("Could not find closing body tag in {0}", indexFile);
                     }
+                }
+                else
+                {
+                    logger.LogInformation("Found client script injected in {0}", indexFile);
                 }
             }
         }

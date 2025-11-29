@@ -6,7 +6,6 @@ using MediaBrowser.Controller.Library;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.Jellysweep.Api;
@@ -32,7 +31,6 @@ public class JellysweepController(
     private readonly ILibraryManager _libraryManager = libraryManager;
     private readonly ILogger<JellysweepController> _logger = logger;
     private readonly ILoggerFactory _loggerFactory = loggerFactory;
-    private static readonly MemoryCache _cache = new(new MemoryCacheOptions());
 
     /// <summary>
     /// Check if a media item is marked for deletion by Jellysweep.
@@ -63,9 +61,6 @@ public class JellysweepController(
                 return BadRequest("Item is not a movie or TV show.");
             }
 
-            // caching is something for later
-            _ = _cache;
-
             var serviceLogger = _loggerFactory.CreateLogger<JellysweepApiService>();
             var jellysweepService = new JellysweepApiService(_libraryManager, serviceLogger);
 
@@ -76,21 +71,6 @@ public class JellysweepController(
                 IsMarkedForDeletion = deletionDate != null,
                 HumanizedTimeUntilDeletion = deletionDate
             });
-
-            /* // Dummy data: return in 30 days for now
-            var deletionDate = DateTimeOffset.UtcNow.AddDays(30);
-            var timeUntilDeletion = deletionDate - DateTimeOffset.UtcNow;
-
-            return Ok(new DeletionStatusResponse
-            {
-                IsMarkedForDeletion = true,
-                DeletionDate = deletionDate,
-                HumanizedTimeUntilDeletion = timeUntilDeletion.Humanize(precision: 1, minUnit: TimeUnit.Day) // Show up to 2 time units
-            }); */
-
-            // Check if the item is marked for deletion by Jellysweep
-            /* var isMarkedForDeletion = item.GetUserData()?.GetValue("JellysweepMarkedForDeletion") as bool? ?? false;
-            return Ok(isMarkedForDeletion); */
         }
         catch (Exception ex)
         {

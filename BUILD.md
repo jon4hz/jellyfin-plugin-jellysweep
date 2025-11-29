@@ -12,7 +12,7 @@ A Jellyfin plugin for sweeping and cleaning media libraries.
 
 ### Prerequisites
 
-- .NET 8.0 SDK
+- .NET 9.0 SDK
 - Linux/Unix environment with bash
 - zip utility (for packaging)
 
@@ -162,7 +162,7 @@ Build and test the plugin:
 ./build.sh --configuration Debug
 
 # Test the build output
-ls -la ../Jellyfin.Plugin.Jellysweep/bin/Debug/net8.0/
+ls -la ../Jellyfin.Plugin.Jellysweep/bin/Debug/net9.0/
 ```
 
 ## Continuous Integration

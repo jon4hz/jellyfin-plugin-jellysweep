@@ -178,12 +178,83 @@ jobs:
 
       - name: Update Plugin Manifest
         run: |
-          # This could be used to update a plugin manifest repository
-          # For now, we'll just output the information needed
-          echo "Plugin Information:"
-          echo "Version: ${{ needs.build.outputs.version }}"
-          echo "Package: ${{ needs.build.outputs.package-name }}"
+          # Update manifest.json with new version
+          echo "Updating manifest.json with version ${{ needs.build.outputs.version }}"
+
           REPO_URL="https://github.com/${{ github.repository }}"
           VERSION="v${{ needs.build.outputs.version }}"
           PACKAGE="${{ needs.build.outputs.package-name }}"
-          echo "Download URL: ${REPO_URL}/releases/download/${VERSION}/${PACKAGE}"
+          DOWNLOAD_URL="${REPO_URL}/releases/download/${VERSION}/${PACKAGE}"
+          PACKAGE_PATH="./artifacts/${{ needs.build.outputs.package-name }}"
+
+          # Calculate MD5 checksum
+          if [ -f "$PACKAGE_PATH" ]; then
+            CHECKSUM=$(md5sum "$PACKAGE_PATH" | cut -d' ' -f1)
+          else
+            echo "Warning: Package file not found, using placeholder checksum"
+            CHECKSUM="placeholder"
+          fi
+
+          # Get current timestamp in ISO format
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Create assembly version format (matching update-version.sh)
+          ASSEMBLY_VERSION="${{ needs.build.outputs.version }}.0"
+
+          # Create new version entry
+          NEW_VERSION='{
+              "version": "'${ASSEMBLY_VERSION}'",
+              "changelog": "- See the full changelog at [GitHub]('${REPO_URL}'/releases/tag/'${VERSION}')\n",
+              "targetAbi": "10.11.0.0",
+              "sourceUrl": "'${DOWNLOAD_URL}'",
+              "checksum": "'${CHECKSUM}'",
+              "timestamp": "'${TIMESTAMP}'"
+          }'
+
+          # Use jq to update the manifest (install jq if not available)
+          if ! command -v jq &> /dev/null; then
+            echo "Installing jq..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+
+          # Add new version to the beginning of versions array
+          jq --argjson newver "$NEW_VERSION" '.[0].versions = [$newver] + .[0].versions' manifest.json > manifest_updated.json
+          mv manifest_updated.json manifest.json
+
+          echo "Updated manifest.json:"
+          cat manifest.json
+
+          # Validate JSON structure
+          if jq empty manifest.json; then
+            echo "✓ manifest.json is valid JSON"
+          else
+            echo "✗ manifest.json is invalid JSON"
+            exit 1
+          fi
+
+      - name: Commit and Push Manifest
+        run: |
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Check if there are changes to commit
+          if git diff --quiet manifest.json; then
+            echo "No changes to manifest.json"
+          else
+            echo "Committing updated manifest.json"
+
+            # Ensure we're on the main branch
+            echo "Current branch: $(git branch --show-current || echo 'detached HEAD')"
+            echo "Checking out main branch..."
+            git fetch origin main
+            git checkout main || git checkout -b main origin/main
+
+            # Add and commit changes
+            git add manifest.json
+            git commit -m "chore: update manifest.json for release v${{ needs.build.outputs.version }}"
+
+            # Push to main branch
+            echo "Pushing changes to main branch..."
+            git push origin main
+          fi

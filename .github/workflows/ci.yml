@@ -27,7 +27,7 @@ jobs:
 
       - name: Test Build Output
         run: |
-          if [ ! -f "Jellyfin.Plugin.Jellysweep/bin/Release/net8.0/Jellyfin.Plugin.Jellysweep.dll" ]; then
+          if [ ! -f "Jellyfin.Plugin.Jellysweep/bin/Release/net9.0/Jellyfin.Plugin.Jellysweep.dll" ]; then
             echo "Build failed - DLL not found"
             exit 1
           fi
