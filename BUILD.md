@@ -162,15 +162,17 @@ Build and test the plugin:
 ./build.sh --configuration Debug
 
 # Test the build output
-ls -la ../Jellyfin.Plugin.Jellysweep/bin/Debug/net9.0/
+ls -la ../Jellyfin.Plugin.Jellysweep/bin/Debug/net10.0/
 ```
 
 ## Continuous Integration
 
-The project includes GitHub Actions workflows:
+The workflows in `.github/workflows/` are thin callers of the shared reusable workflows in
+[jon4hz/jellyfin-plugin-ci](https://github.com/jon4hz/jellyfin-plugin-ci):
 
-- **CI Build** (`ci.yml`): Runs on every push/PR to validate the build
-- **Build and Release** (`build-release.yml`): Triggered on tag creation, builds and creates GitHub releases
+- **CI** (`ci.yml`): build with warnings as errors plus pre-commit on every push/PR
+- **Release** (`release.yml`): triggered on tag creation, builds the package, creates the GitHub release and updates `manifest.json`
+- **Update pre-commit hooks** (`update-pre-commit.yml`): weekly `pre-commit autoupdate` PR
 
 ### Creating a Release
 
